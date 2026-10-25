@@ -1,0 +1,25 @@
+= Include de URL, subs +quotes e exemplo recolhível
+
+Antes.
+
+include::https://example.com/x.yaml[]
+
+[source,yaml]
+----
+include::https://example.com/y.yaml[]
+----
+
+include::nao-existe.adoc[leveloffset=+1]
+
+[source,terminal,subs="+quotes"]
+----
+$ oc apply -f _<ns.yaml>_ e *<b>* e <SERVICE_NAME>_PORT_<PORT>_TCP
+----
+
+Texto <SERVICE_NAME>_PORT_<PORT>_TCP fim.
+
+.Um
+[%collapsible]
+====
+x
+====

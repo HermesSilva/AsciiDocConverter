@@ -1,0 +1,9 @@
+:_mod-docs-content-type: CONCEPT
+[id="modulo-incluido"]
+= Título do módulo
+
+Texto do módulo incluído.
+
+== Subtítulo do módulo
+
+Mais texto.

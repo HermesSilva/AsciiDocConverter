@@ -1,0 +1,47 @@
+= Título do Documento
+Autor Exemplo <autor@exemplo.com>
+v2.1, 2026-10-24: Observação
+:toc:
+:sectnums:
+:toclevels: 3
+
+Preâmbulo antes da primeira seção.
+
+== Primeira
+
+Texto da primeira.
+
+=== Primeira A
+
+Texto.
+
+==== Primeira A1
+
+Texto.
+
+=== Primeira B
+
+Texto.
+
+== Segunda
+
+[[id-explicito]]
+=== Segunda com id
+
+Texto.
+
+[discrete]
+== Título discreto
+
+Texto após discreto.
+
+[.papel-secao]
+== Terceira com papel
+
+Texto.
+
+== Repetida
+
+== Repetida
+
+Duas seções com o mesmo título geram ids distintos.

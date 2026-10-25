@@ -1,0 +1,11 @@
+= Documento com parte
+
+Antes da parte.
+
+= Parte no corpo
+
+Depois da parte.
+
+== Seção da parte
+
+Texto da seção.

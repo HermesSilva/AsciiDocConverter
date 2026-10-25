@@ -1,0 +1,1 @@
+Parágrafo do módulo A, sem quebra de linha no fim.

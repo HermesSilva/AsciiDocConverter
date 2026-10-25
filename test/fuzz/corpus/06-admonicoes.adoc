@@ -1,0 +1,34 @@
+NOTE: Nota em parágrafo.
+
+TIP: Dica em parágrafo
+que continua na linha seguinte.
+
+IMPORTANT: Importante.
+
+WARNING: Atenção.
+
+CAUTION: Cuidado.
+
+[NOTE]
+Nota com estilo em parágrafo.
+
+[NOTE]
+====
+Nota em bloco com *forte*.
+
+Segundo parágrafo.
+====
+
+.Título da nota
+[TIP]
+====
+Dica com título.
+====
+
+[WARNING]
+--
+Atenção em bloco aberto.
+--
+
+[#nota-id.papel]
+NOTE: Nota com id e papel.

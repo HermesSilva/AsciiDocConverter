@@ -1,0 +1,5 @@
+:_mod-docs-content-type: CONCEPT
+[id="modulo-b"]
+= Módulo B
+
+Texto do módulo B.

@@ -1,0 +1,74 @@
+= Tags de include e estilo de coluna depois da largura
+
+== tag=!CAPI
+
+----
+include::incluidos/tags-fonte.adoc[tag=!CAPI]
+----
+
+== tag=a
+
+----
+include::incluidos/tags-fonte.adoc[tag=a]
+----
+
+== tags=a;!b
+
+----
+include::incluidos/tags-fonte.adoc[tags=a;!b]
+----
+
+== tags=*
+
+----
+include::incluidos/tags-fonte.adoc[tags=*]
+----
+
+== tags=**;!CAPI
+
+----
+include::incluidos/tags-fonte.adoc[tags=**;!CAPI]
+----
+
+== tags=*;!b
+
+----
+include::incluidos/tags-fonte.adoc[tags=*;!b]
+----
+
+== tags=!a;!CAPI
+
+----
+include::incluidos/tags-fonte.adoc[tags=!a;!CAPI]
+----
+
+== tag=b
+
+----
+include::incluidos/tags-fonte.adoc[tag=b]
+----
+
+== tags=**
+
+----
+include::incluidos/tags-fonte.adoc[tags=**]
+----
+
+== tags=a,CAPI
+
+----
+include::incluidos/tags-fonte.adoc[tags=a,CAPI]
+----
+
+== Tabela
+
+[cols=".^2,.^3a"]
+|===
+|A
+|Texto da celula.
+
+include::incluidos/snip-admonicao.adoc[]
+
+|B
+|Outra.
+|===

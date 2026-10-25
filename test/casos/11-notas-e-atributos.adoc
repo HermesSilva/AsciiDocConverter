@@ -1,0 +1,45 @@
+= Atributos
+:produto: AsciiDocConverter
+:versao: 0.1
+:url-site: https://tootega.com.br
+
+O {produto} versão {versao} mora em {url-site}.
+
+Link por atributo: {url-site}[Site] e {url-site}/docs[Docs].
+
+Indefinido fica como está: {nao-existe}.
+
+Escapado: \{produto}.
+
+:contador: 0
+
+Contadores: {counter:cnt} {counter:cnt} {counter:cnt} e {counter2:cnt}{cnt}.
+
+Nota de rodapé.footnote:[Primeira nota.] Outra nota.footnote:nota2[Segunda nota, com id.] Referência à mesma.footnote:nota2[]
+
+== Condicionais
+
+:ligado:
+
+ifdef::ligado[]
+Aparece porque ligado está definido.
+endif::[]
+
+ifndef::ligado[]
+Não aparece.
+endif::[]
+
+ifdef::desligado[Linha única não aparece.]
+ifdef::ligado[Linha única aparece.]
+
+ifeval::["{versao}" == "0.1"]
+Versão confere.
+endif::[]
+
+:ligado!:
+
+ifdef::ligado[]
+Não aparece mais.
+endif::[]
+
+Fim.

@@ -1,0 +1,76 @@
+* um
+* dois
+* três
+
+- traço um
+- traço dois
+
+* nível 1
+** nível 2
+*** nível 3
+** nível 2 de novo
+* nível 1 de novo
+
+. primeiro
+. segundo
+.. segundo a
+.. segundo b
+. terceiro
+
+1. numerado explícito
+2. continua
+3. termina
+
+a. letra a
+b. letra b
+
+i) romano um
+ii) romano dois
+
+[square]
+* quadrado
+
+[start=4]
+. começa em quatro
+. cinco
+
+[%reversed]
+. invertido um
+. invertido dois
+
+* [ ] tarefa aberta
+* [x] tarefa feita
+
+.Lista com título
+* item com título de lista
+
+* item com parágrafo anexado
++
+Parágrafo anexado.
++
+Segundo parágrafo anexado.
+
+* item com bloco literal anexado
++
+----
+código anexado
+----
+* item com lista anexada
+
+* item cuja linha
+  continua indentada
+* outro item
+
+* item seguido de literal
+ literal colado
+
+Parágrafo que encerra.
+
+* lista
+* separada
+
+por parágrafo.
+
+. ordenada
+* não ordenada aninhada
+. ordenada de novo

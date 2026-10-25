@@ -1,0 +1,17 @@
+= Ícones
+:icons:
+
+NOTE: Nota com ícone de imagem.
+
+[TIP,caption=Truque]
+====
+Dica com legenda própria.
+====
+
+[source,yaml]
+----
+a: 1 # <1>
+b: 2 # <2>
+----
+<1> Primeiro.
+<2> Segundo.

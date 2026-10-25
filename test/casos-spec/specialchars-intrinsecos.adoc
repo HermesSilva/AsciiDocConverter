@@ -1,0 +1,2 @@
+Os intrínsecos {amp}{lt}{gt} saem como & < > crus no Asciidoctor 2.0.x (HTML inválido). A casa escapa
+(&amp; &lt; &gt;), como a especificação manda: specialchars é tarefa do conversor sobre todo texto (SDR-5).

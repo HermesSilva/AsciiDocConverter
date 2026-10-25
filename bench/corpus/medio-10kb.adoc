@@ -1,0 +1,334 @@
+= Guia do Conversor
+Hermes Silva <hxpelo@gmail.com>
+v1.0, 2026-10-24: Primeira versão
+:toc:
+:sectnums:
+:produto: AsciiDocConverter
+
+Este é o *preâmbulo* do _documento_ com `código` e uma referência a {produto}.
+Segunda linha do parágrafo com link https://tootega.com.br[Tootega] e e-mail hxpelo@gmail.com.
+
+== Seção 1
+
+.Uma lista com título
+* item um
+* item dois com **negrito** parcial
+** subitem
+* item três
++
+Parágrafo anexado ao item três.
+
+. primeiro
+. segundo
+
+termo:: definição do termo
+outro termo::
+  definição em outra linha
+
+NOTE: Uma nota com rodapé.footnote:[Texto da nota.]
+
+[source,c]
+----
+int main(void) { return 0; } // <1>
+----
+<1> Ponto de entrada.
+
+[WARNING]
+====
+Bloco de atenção com *conteúdo*.
+
+Segundo parágrafo.
+====
+
+.Tabela de exemplo
+[cols="1,2",options="header"]
+|===
+|Coluna A |Coluna B
+
+|a1 |b1 com `code`
+|a2 |b2
+|===
+
+image::figura.png[Uma figura,200]
+
+=== Subseção com "`aspas`" e (C) e -- travessão
+
+Texto com ^sup^ e ~sub~, #marcado#, e uma quebra +
+de linha. Veja <<_seção_1>>.
+
+'''
+
+[quote, Autor, Obra]
+____
+Citação longa.
+____
+== Seção 2
+
+.Uma lista com título
+* item um
+* item dois com **negrito** parcial
+** subitem
+* item três
++
+Parágrafo anexado ao item três.
+
+. primeiro
+. segundo
+
+termo:: definição do termo
+outro termo::
+  definição em outra linha
+
+NOTE: Uma nota com rodapé.footnote:[Texto da nota.]
+
+[source,c]
+----
+int main(void) { return 0; } // <1>
+----
+<1> Ponto de entrada.
+
+[WARNING]
+====
+Bloco de atenção com *conteúdo*.
+
+Segundo parágrafo.
+====
+
+.Tabela de exemplo
+[cols="1,2",options="header"]
+|===
+|Coluna A |Coluna B
+
+|a1 |b1 com `code`
+|a2 |b2
+|===
+
+image::figura.png[Uma figura,200]
+
+=== Subseção com "`aspas`" e (C) e -- travessão
+
+Texto com ^sup^ e ~sub~, #marcado#, e uma quebra +
+de linha. Veja <<_seção_2>>.
+
+'''
+
+[quote, Autor, Obra]
+____
+Citação longa.
+____
+== Seção 3
+
+.Uma lista com título
+* item um
+* item dois com **negrito** parcial
+** subitem
+* item três
++
+Parágrafo anexado ao item três.
+
+. primeiro
+. segundo
+
+termo:: definição do termo
+outro termo::
+  definição em outra linha
+
+NOTE: Uma nota com rodapé.footnote:[Texto da nota.]
+
+[source,c]
+----
+int main(void) { return 0; } // <1>
+----
+<1> Ponto de entrada.
+
+[WARNING]
+====
+Bloco de atenção com *conteúdo*.
+
+Segundo parágrafo.
+====
+
+.Tabela de exemplo
+[cols="1,2",options="header"]
+|===
+|Coluna A |Coluna B
+
+|a1 |b1 com `code`
+|a2 |b2
+|===
+
+image::figura.png[Uma figura,200]
+
+=== Subseção com "`aspas`" e (C) e -- travessão
+
+Texto com ^sup^ e ~sub~, #marcado#, e uma quebra +
+de linha. Veja <<_seção_3>>.
+
+'''
+
+[quote, Autor, Obra]
+____
+Citação longa.
+____
+== Seção 4
+
+.Uma lista com título
+* item um
+* item dois com **negrito** parcial
+** subitem
+* item três
++
+Parágrafo anexado ao item três.
+
+. primeiro
+. segundo
+
+termo:: definição do termo
+outro termo::
+  definição em outra linha
+
+NOTE: Uma nota com rodapé.footnote:[Texto da nota.]
+
+[source,c]
+----
+int main(void) { return 0; } // <1>
+----
+<1> Ponto de entrada.
+
+[WARNING]
+====
+Bloco de atenção com *conteúdo*.
+
+Segundo parágrafo.
+====
+
+.Tabela de exemplo
+[cols="1,2",options="header"]
+|===
+|Coluna A |Coluna B
+
+|a1 |b1 com `code`
+|a2 |b2
+|===
+
+image::figura.png[Uma figura,200]
+
+=== Subseção com "`aspas`" e (C) e -- travessão
+
+Texto com ^sup^ e ~sub~, #marcado#, e uma quebra +
+de linha. Veja <<_seção_4>>.
+
+'''
+
+[quote, Autor, Obra]
+____
+Citação longa.
+____
+== Seção 5
+
+.Uma lista com título
+* item um
+* item dois com **negrito** parcial
+** subitem
+* item três
++
+Parágrafo anexado ao item três.
+
+. primeiro
+. segundo
+
+termo:: definição do termo
+outro termo::
+  definição em outra linha
+
+NOTE: Uma nota com rodapé.footnote:[Texto da nota.]
+
+[source,c]
+----
+int main(void) { return 0; } // <1>
+----
+<1> Ponto de entrada.
+
+[WARNING]
+====
+Bloco de atenção com *conteúdo*.
+
+Segundo parágrafo.
+====
+
+.Tabela de exemplo
+[cols="1,2",options="header"]
+|===
+|Coluna A |Coluna B
+
+|a1 |b1 com `code`
+|a2 |b2
+|===
+
+image::figura.png[Uma figura,200]
+
+=== Subseção com "`aspas`" e (C) e -- travessão
+
+Texto com ^sup^ e ~sub~, #marcado#, e uma quebra +
+de linha. Veja <<_seção_5>>.
+
+'''
+
+[quote, Autor, Obra]
+____
+Citação longa.
+____
+== Seção 6
+
+.Uma lista com título
+* item um
+* item dois com **negrito** parcial
+** subitem
+* item três
++
+Parágrafo anexado ao item três.
+
+. primeiro
+. segundo
+
+termo:: definição do termo
+outro termo::
+  definição em outra linha
+
+NOTE: Uma nota com rodapé.footnote:[Texto da nota.]
+
+[source,c]
+----
+int main(void) { return 0; } // <1>
+----
+<1> Ponto de entrada.
+
+[WARNING]
+====
+Bloco de atenção com *conteúdo*.
+
+Segundo parágrafo.
+====
+
+.Tabela de exemplo
+[cols="1,2",options="header"]
+|===
+|Coluna A |Coluna B
+
+|a1 |b1 com `code`
+|a2 |b2
+|===
+
+image::figura.png[Uma figura,200]
+
+=== Subseção com "`aspas`" e (C) e -- travessão
+
+Texto com ^sup^ e ~sub~, #marcado#, e uma quebra +
+de linha. Veja <<_seção_6>>.
+
+'''
+
+[quote, Autor, Obra]
+____
+Citação longa.
+____

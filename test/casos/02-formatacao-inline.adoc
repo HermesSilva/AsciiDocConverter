@@ -1,0 +1,23 @@
+Texto *forte*, _ênfase_, `código`, #marcado#, ^sobrescrito^ e ~subscrito~.
+
+Formas sem restrição: **n**egrito parcial, __ê__nfase parcial, ``c``ódigo parcial e ##m##arca parcial.
+
+Aninhado: *forte com _ênfase_ dentro* e _ênfase com `código` dentro_.
+
+Com papel: [.destaque]*texto* e [.azul]#texto#.
+
+Escapes: \*não é forte\*, \_não é ênfase\_, \`não é código\`.
+
+Passthrough: +texto *cru* aqui+, ++outro *cru*++ e +++<b>html</b>+++.
+
+Aspas tipográficas: "`entre aspas duplas`" e '`entre aspas simples`'.
+
+Substituições: (C) (R) (TM) ... -> <- => <= e um travessão -- assim, ou colado--assim.
+
+Apóstrofo: o Hermes's não é português mas testa l'apostrofo.
+
+Referência de caractere: &amp; &lt; &gt; &#8212; &#x2014; e caracteres soltos & < >.
+
+Atributos intrínsecos: {nbsp}{sp}{zwsp}{startsb}{endsb}{vbar}{plus}{caret}{asterisk}{tilde}{backslash}{backtick}{cpp}{apos}{quot}
+
+Sem fecho: *isto não fecha e um _isto também não.

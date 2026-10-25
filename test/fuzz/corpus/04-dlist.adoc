@@ -1,0 +1,33 @@
+termo um:: definição um
+termo dois:: definição dois
+termo três::
+definição na linha seguinte
+
+termo com dois:: nomes
+outro nome::
+  definição indentada
+
+termo aninhado:: definição
+sub termo::: sub definição
+sub termo dois::: sub definição dois
+termo de volta:: definição de volta
+
+[horizontal]
+horizontal um:: definição h1
+horizontal dois:: definição h2
+
+[qanda]
+Pergunta um?:: Resposta um.
+Pergunta dois?:: Resposta dois.
+
+termo com bloco::
+definição
++
+Parágrafo anexado à definição.
+
+termo com lista::
+* item a
+* item b
+
+termo sem definição::
+termo seguinte:: definição

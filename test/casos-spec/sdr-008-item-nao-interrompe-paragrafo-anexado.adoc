@@ -1,0 +1,4 @@
+* item
++
+parágrafo anexado
+* no Asciidoctor 2.0.x esta linha é um novo item; pela SDR-8 ela continua o parágrafo anexado

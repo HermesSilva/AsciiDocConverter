@@ -1,0 +1,41 @@
+image::figura.png[]
+
+image::figura.png[Texto alternativo]
+
+image::figura.png[Alternativo,200,100]
+
+image::figura.png[alt=Nomeado,width=300,link=https://tootega.com.br]
+
+.Figura com título
+image::figura.png[Com título]
+
+[#fig-id.papel,align=center]
+image::figura.png[Centralizada]
+
+Imagem inline image:icone.png[] e com alt image:icone.png[ícone,16,16] e com link image:icone.png[Link,link=https://x.y].
+
+Teclas kbd:[Ctrl+Shift+T], kbd:[F11] e botão btn:[OK].
+
+Menu menu:Arquivo[Salvar como] e menu:Arquivo[] e menu:Editar[Preferências > Avançado].
+
+Ícone icon:heart[] e icon:tags[alt=Marcadores].
+
+<<<
+
+'''
+
+Depois das quebras.
+
+video::filme.mp4[]
+
+audio::som.mp3[]
+
+Índice ((termo visível)) e (((oculto))) e indexterm:[outro oculto].
+
+Fórmula stem:[x^2] e latexmath:[\frac{1}{2}].
+
+image::foto.jpg[Foto JPEG,160]
+
+image::cinza.jpg[JPEG em tons de cinza]
+
+image::icone.png[PNG com alfa,64]

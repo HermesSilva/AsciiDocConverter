@@ -1,0 +1,7 @@
+// comentario
+:_mod-docs-content-type: SNIPPET
+
+[IMPORTANT]
+====
+Texto importante.
+====

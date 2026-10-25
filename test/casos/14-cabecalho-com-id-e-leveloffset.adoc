@@ -1,0 +1,15 @@
+[id="doc-com-id"]
+= Documento com id antes do título
+:velero-1.12: 1.12
+
+Texto do preâmbulo.
+
+toc::[]
+
+== Seção um
+
+include::incluidos/modulo-com-titulo.adoc[leveloffset=+1]
+
+== Seção dois
+
+Fim do documento.

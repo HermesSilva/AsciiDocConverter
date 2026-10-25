@@ -1,0 +1,13 @@
+L0 fora
+// tag::a[]
+A1
+// tag::b[]
+B1 dentro de a
+// end::b[]
+A2
+// end::a[]
+L1 fora
+// tag::CAPI[]
+CAPI1
+// end::CAPI[]
+L2 fim

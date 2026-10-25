@@ -1,0 +1,41 @@
+Um parágrafo simples de uma linha.
+
+Um parágrafo com várias linhas que
+continuam na linha seguinte e
+terminam aqui.
+
+.Título do parágrafo
+Parágrafo com título de bloco.
+
+[#um-id.papel-x]
+Parágrafo com id e papel.
+
+ Parágrafo literal indentado
+ com duas linhas.
+
+[literal]
+Parágrafo com estilo literal
+em duas linhas.
+
+[source,ruby]
+puts "parágrafo com estilo source"
+
+[normal]
+  Texto indentado com estilo normal vira parágrafo.
+
+Linha com quebra forçada +
+continua aqui.
+
+[%hardbreaks]
+Linha um
+linha dois
+linha três.
+
+// comentário de linha, não aparece
+
+////
+bloco de comentário
+não aparece
+////
+
+Último parágrafo.

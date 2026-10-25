@@ -1,0 +1,88 @@
+----
+listagem
+  com indentação
+----
+
+....
+literal
+....
+
+====
+Exemplo com *forte*.
+
+Segundo parágrafo do exemplo.
+====
+
+.Exemplo com título
+====
+Conteúdo.
+====
+
+****
+Barra lateral.
+
+* com lista
+****
+
+.Barra com título
+****
+Conteúdo.
+****
+
+____
+Citação em bloco.
+____
+
+[quote, Autor, Obra]
+____
+Citação com atribuição.
+____
+
+[verse, Poeta, Poema]
+____
+Verso um
+verso dois
+____
+
+[quote]
+Parágrafo com estilo quote.
+
+[sidebar]
+Parágrafo com estilo sidebar.
+
+[example]
+Parágrafo com estilo example.
+
+--
+Bloco aberto.
+--
+
+[abstract]
+--
+Resumo em bloco aberto.
+--
+
+++++
+<p class="passthrough">passa <em>cru</em></p>
+++++
+
+[pass]
+<span>passthrough em parágrafo</span>
+
+======
+Exemplo com delimitador maior.
+
+====
+Exemplo aninhado com delimitador menor.
+====
+======
+
+[source]
+--
+código em bloco aberto com estilo source
+--
+
+[literal]
+--
+literal em bloco aberto
+--

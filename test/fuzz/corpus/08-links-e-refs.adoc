@@ -1,0 +1,27 @@
+URL solta https://tootega.com.br e com texto https://tootega.com.br[Tootega].
+
+Nova janela https://tootega.com.br[Tootega^] e com window link:https://x.y[X,window=_blank].
+
+Macro link:relativo/pagina.html[Página] e link:https://a.b/c[].
+
+E-mail solto contato@tootega.com.br e mailto:contato@tootega.com.br[Fale conosco].
+
+URL com pontuação final https://tootega.com.br/caminho. E entre parênteses (https://tootega.com.br).
+
+Esquemas: ftp://servidor/arquivo e irc://canal.
+
+[[ancora-a]]
+Parágrafo com âncora de bloco.
+
+[#ancora-b]
+Parágrafo com id curto.
+
+Referências: <<ancora-a>>, <<ancora-b,texto próprio>>, xref:ancora-a[], xref:ancora-a[texto xref] e <<inexistente>>.
+
+Âncora inline [[ancora-c]]aqui e anchor:ancora-d[]ali, depois <<ancora-c>> e <<ancora-d>>.
+
+== Seção Alvo
+
+Texto. Veja <<_seção_alvo>> e <<_seção_alvo,a seção>>.
+
+Para outro documento: <<outro.adoc#id,Outro>> e xref:outro.adoc[Outro doc].

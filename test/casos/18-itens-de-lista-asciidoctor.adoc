@@ -1,0 +1,60 @@
+= Itens de lista como o Asciidoctor
+
+* a
++
+para anexada
+** nested absorvido pelo parágrafo anexado
+
+* b
+mais texto do b
+** aninhado de verdade
+
+. passo
++
+----
+code
+----
+where:
+<x>:: desc
+. passo2
+
+* c
++
+----
+c
+----
+texto solto depois do bloco
+* d
+
+* n1
+** n2
+*** n3
+
++
+para do n1 (continuação destacada)
+
+* d2
+. passo aninhado por adjacência
++
+t1:: d1
++
+cont d1
+
++
+para do passo
+
+. passo seguinte
+
+* e
++
+* irmão depois do +
+** filho
++
+* irmão de novo
+
+termo sem texto::
+  descrição indentada
+
+outro termo::
+
+descrição depois de linha vazia

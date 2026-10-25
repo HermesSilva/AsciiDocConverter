@@ -1,0 +1,83 @@
+|===
+|a |b
+|c |d
+|===
+
+|===
+|Cabeçalho 1 |Cabeçalho 2
+
+|1 |2
+|3 |4
+|===
+
+[cols="1,2,3"]
+|===
+|um |dois |três
+|===
+
+[cols="2,1",options="header"]
+|===
+|Nome |Valor
+|alfa |1
+|beta |2
+|===
+
+.Tabela com título
+[%header%footer,cols="^1,>2"]
+|===
+|Centro |Direita
+|c1 |d1
+|Rodapé |R
+|===
+
+|===
+|célula com *forte*
+e segunda linha
+
+|célula com dois
+
+parágrafos
+|===
+
+[cols="1,1"]
+|===
+2+|duas colunas
+|a |b
+.2+|duas linhas |x
+|y
+|===
+
+[cols="a,m,l"]
+|===
+|célula asciidoc
+
+* lista
+|mono
+|literal
+  preserva
+|===
+
+[cols="h,d"]
+|===
+|cabeçalho de linha |valor
+|===
+
+,===
+csv um,csv dois
+"com, vírgula",fim
+,===
+
+[width=50%]
+|===
+|meia largura
+|===
+
+[frame=none,grid=rows]
+|===
+|sem moldura |grade de linhas
+|===
+
+[%autowidth]
+|===
+|auto |largura
+|===

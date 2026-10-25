@@ -1,0 +1,17 @@
+# Scripts shell precisam de LF (CRLF quebra o shebang no Linux).
+*.sh text eol=lf
+# Scripts do cmd exigem CRLF (sem o CR o interpretador consome o primeiro caractere da linha seguinte).
+*.cmd text eol=crlf
+*.bat text eol=crlf
+# Fontes e binários nativos.
+*.ttf binary
+*.dll binary
+*.so binary
+*.png binary
+*.jpg binary
+# Casos e golden: LF sempre (o TCK e o golden comparam texto).
+*.adoc text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.c text eol=lf
+*.h text eol=lf

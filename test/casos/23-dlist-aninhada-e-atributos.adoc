@@ -1,0 +1,31 @@
+= Lista de definição aninhada, atributos com ]] e toc-title no corpo
+:toc:
+
+:toc-title: Título do corpo
+
+== Procedimento
+
+. Aplique o arquivo:
++
+[source,terminal,subs="attributes+"]]
+----
+$ oc apply -f <arquivo>.yaml
+----
++
+where:
++
+`<arquivo>`:: Especifica o arquivo.
+
+.Verification
+
+. Verifique o resultado.
+
+. Passo
++
+where:
++
+f:: Desc.
+
+Parágrafo absorvido pelo item.
+
+. Passo seguinte

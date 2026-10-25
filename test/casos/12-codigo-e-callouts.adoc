@@ -1,0 +1,63 @@
+[source,c]
+----
+#include <stdio.h>          // <1>
+
+int main(void) {
+    printf("olá\n");        // <2>
+    return 0;               // <3>
+}
+----
+<1> Cabeçalho.
+<2> Imprime.
+<3> Sai.
+
+[source,python]
+----
+def f(x):
+    return x * 2  # <.>
+----
+<.> Dobro.
+
+.Com título
+[source]
+----
+texto <sem> &escape; "aspas"
+----
+
+----
+sem linguagem
+----
+
+[source,java,linenums]
+----
+class A {}
+----
+
+:source-language: ruby
+
+[source]
+----
+puts 1
+----
+
+:minha-versao: 0.1.0
+
+[subs="attributes+"]
+----
+versão {minha-versao}
+----
+
+[listing]
+texto com estilo listing
+
+....
+literal com <tags> & tal
+....
+
+```
+cerca estilo markdown
+```
+
+```js
+console.log(1)
+```

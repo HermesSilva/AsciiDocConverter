@@ -1,0 +1,3 @@
+~~~~
+Bloco aberto com til (SDR-1): o Asciidoctor 2.0.x não o reconhece; a especificação sim.
+~~~~

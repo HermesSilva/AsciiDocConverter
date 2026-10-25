@@ -1,0 +1,44 @@
+= Continuações e passthrough
+:experimental:
+
+* a
++
+
+para anexada depois de linha vazia
+
+* b
+** b1
+
++
+para do item b (ancestral)
+
+* c
++
+* d irmão depois do + com quebra forçada no fim +
+
+Parágrafo que separa as listas.
+
+. passo
++
+t1:: d1
++
+cont d1
+
++
+para do passo
+
+. passo2
+
+Digite *`pass:[*]`* e pressione kbd:[Ctrl+Space] ou kbd:[Ctrl,T].
+
+|====
+|um |dois
+|====
+
+:toc:
+
+== Seção
+
+O :toc: acima está no corpo e não liga o sumário.
+
+toc::[]

@@ -1,0 +1,24 @@
+# --- Build ---
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+
+# Os binários nativos de Dist/ (um por SO/arquitetura) SÃO versionados: o build dos hosts da plataforma
+# e a imagem Docker os consomem prontos, e o Linux exige cross-compiler que nem toda máquina tem.
+# Gerados por Build-AsciiDocConverter.ps1. (Sem esta exceção, a regra "dist/" de um .gitignore global
+# os engoliria no Windows, onde o Git não diferencia caixa.)
+!Dist/
+
+# --- Saídas de teste e ferramentas ---
+test/golden-obtido/
+node_modules/
+*.log
+.DS_Store
+
+# As fontes geradas (obj/fontes/*.c) não se versionam: nascem no build de fontes/*.ttf.
+
+# PDB solto do cl.exe (o MSBuild e o Compilar-Dev gravam os seus em obj/)
+*.pdb

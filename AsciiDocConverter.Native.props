@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Incorpora os binários nativos do AsciiDocConverter (gerados por Build-AsciiDocConverter.ps1) à saída
+       do build e da publicação de quem importar este arquivo (o Tootega.Core, que os repassa aos hosts).
+       Todos os alvos vão juntos, com nomes distintos por sistema operacional/arquitetura; quem escolhe o
+       certo em tempo de execução é o resolvedor do Tootega.Core (XAsciiDocConverter).
+
+       O Include é curinga: pasta Dist vazia (ainda não compilada) não quebra o build — a ausência é
+       detectada no boot, por XAsciiDocConverter.GarantirBibliotecaNativa(). Mesmo padrão da Tootega.LZMA. -->
+
+  <PropertyGroup>
+    <AsciiDocConverterDistDir>$(MSBuildThisFileDirectory)Dist\</AsciiDocConverterDistDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="$(AsciiDocConverterDistDir)AsciiDocConverter.*.dll;$(AsciiDocConverterDistDir)AsciiDocConverter.*.so">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+
+</Project>

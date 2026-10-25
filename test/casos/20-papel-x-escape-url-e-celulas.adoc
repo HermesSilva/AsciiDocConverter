@@ -1,0 +1,19 @@
+= Papel [x-], escape de URL, especificador de célula e travessão
+
+Apache ([x-]`rhscl/httpd-*`) e [.papel]*forte* e [x,y]_enfase_.
+
+Navegue para \https://<JAEGER_URL>, onde fica \https://x.org[texto].
+
+|===
+|Componente |Valor
+|17th Generation iDRAC 10 |v1.20
+|pcmk_delay_base
+|--
+2+|span
+|===
+
+Linha com -- no meio e
+-- no início da linha.
+
+Outros: [y x-]`a_b_c` e [x-]+mono *forte*+ e [x-]`*cru*`.
+

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7A1D3C2E-5B64-4F1A-9C0E-ADC0ADC0ADC1}</ProjectGuid>
+    <ProjectName>AsciiDocConverter</ProjectName>
+    <RootNamespace>AsciiDocConverter</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <!-- Projeto C nativo: sem NuGet (mesma solução da Tootega.LZMA; o NU1503 é rebaixado no .rsp da solução). -->
+    <RestoreProjectStyle>None</RestoreProjectStyle>
+    <RestoreEnabled>false</RestoreEnabled>
+  </PropertyGroup>
+  <!-- O dotnet CLI (MSBuild Core) não carrega os targets do C++; sob ele o projeto vira no-op (padrão Tootega.LZMA). -->
+  <PropertyGroup>
+    <TootegaNativeBuildSuportado Condition="'$(MSBuildRuntimeType)'!='Core'">true</TootegaNativeBuildSuportado>
+    <TootegaNativeBuildSuportado Condition="'$(MSBuildRuntimeType)'=='Core'">false</TootegaNativeBuildSuportado>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" Condition="'$(TootegaNativeBuildSuportado)'=='true'" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset Condition="'$(DefaultPlatformToolset)'!=''">$(DefaultPlatformToolset)</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" Condition="'$(TootegaNativeBuildSuportado)'=='true'" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(TootegaNativeBuildSuportado)'=='true'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <TargetName>AsciiDocConverter</TargetName>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)'=='Debug'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)'=='Release'">false</LinkIncremental>
+    <FontesEmbutidasC>$(ProjectDir)obj\fontes\adc_fontes_embutidas.c</FontesEmbutidasC>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <!-- Aviso é erro, como em todo projeto da casa. As exceções abaixo são avisos de estilo do MSVC sobre C11
+           (parâmetro não usado, constante condicional, inicializador não constante) e sobre o miniz. -->
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4996;4100;4127;4204;4221;4456;4457;4459;4295;4310;4267;4244;4245;4701;4702;4703;4706;4324;4005;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <!-- Fontes e literais em UTF-8 (as mensagens em pt-BR têm acento). -->
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)src;$(ProjectDir)src\pdf;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;_USRDLL;ADC_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <!-- As fontes Liberation entram no binário comprimidas; o gerador é Python 3 só com biblioteca padrão. -->
+      <Command>python -I "$(ProjectDir)ferramentas\gerar_fontes.py" "$(FontesEmbutidasC)"</Command>
+      <Message>Gerando as fontes embutidas (ferramentas/gerar_fontes.py)</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\**\*.c" />
+    <ClCompile Include="terceiros\miniz.c" />
+    <ClCompile Include="$(FontesEmbutidasC)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\adc.h" />
+    <ClInclude Include="src\**\*.h" />
+    <ClInclude Include="terceiros\miniz.h" />
+    <ClInclude Include="terceiros\stb_truetype.h" />
+  </ItemGroup>
+  <!-- Alvos vazios só para o dotnet CLI (ver Tootega.LZMA.vcxproj: ficam ANTES do Import dos targets do C++). -->
+  <Target Name="Build" Condition="'$(TootegaNativeBuildSuportado)'=='false'">
+    <Message Importance="high" Text="$(MSBuildProjectName): ignorado sob o dotnet CLI. Compile pelo Visual Studio, por MSBuild.exe ou por Build-AsciiDocConverter.ps1." />
+  </Target>
+  <Target Name="Rebuild" Condition="'$(TootegaNativeBuildSuportado)'=='false'" DependsOnTargets="Build" />
+  <Target Name="Clean" Condition="'$(TootegaNativeBuildSuportado)'=='false'" />
+  <Target Name="Restore" Condition="'$(TootegaNativeBuildSuportado)'=='false'" />
+  <Target Name="Publish" Condition="'$(TootegaNativeBuildSuportado)'=='false'" />
+  <Target Name="VSTest" Condition="'$(TootegaNativeBuildSuportado)'=='false'" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" Condition="'$(TootegaNativeBuildSuportado)'=='true'" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

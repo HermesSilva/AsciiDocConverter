@@ -1,0 +1,3 @@
+:frase: texto com *forte* dentro
+
+Atributo com marcação: {frase}. A especificação (SDR-5) parseia o valor resolvido; o Asciidoctor 2.0.x não.

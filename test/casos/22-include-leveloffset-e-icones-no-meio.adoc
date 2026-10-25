@@ -1,0 +1,18 @@
+= Includes com leveloffset colados e ícones no meio
+
+== Seção
+
+include::incluidos/modulo-sem-fim-de-linha.adoc[leveloffset=+1]
+include::incluidos/modulo-b.adoc[leveloffset=+2]
+
+Clique *Add a filter +* e siga.
+
+NOTE: Antes de ligar os ícones.
+
+:icons: font
+
+NOTE: Depois de ligar os ícones.
+
+:icons!:
+
+TIP: Depois de desligar.
