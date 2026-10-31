@@ -107,6 +107,11 @@ ADC_INLINE ADC_Fatia adc_buffer_fatia_de(const ADC_Buffer* pB) {
     return adc_fatia((const char*)pB->dados, pB->tamanho);
 }
 
+/* --------------------------------------------------------------- base64 ---- */
+
+/* Escreve os bytes em base64 padrão (com '='), sem quebras de linha. */
+void adc_base64_escrever(ADC_Buffer* pB, const uint8_t* pDados, int32_t pTamanho);
+
 /* ----------------------------------------------------------------- utf8 ---- */
 
 /* Valida UTF-8 estrito (sem sobrelongos, sem substitutos, ≤ U+10FFFF). Devolve -1 se válido, ou o

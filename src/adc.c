@@ -1,15 +1,18 @@
 /*
  * ABI pública (include/adc.h): valida, parseia uma vez, renderiza no formato pedido (IC-1).
+ * A mecânica vive em adc_converter_interno (adc_interno.h), que a entrada WebAssembly também usa com "extras";
+ * ADC_Converter a chama sem extras e por isso se comporta como sempre (DAD-9).
  */
 #ifndef ADC_EXPORTS
 #define ADC_EXPORTS
 #endif
 #include "../include/adc.h"
+#include "adc_interno.h"
 #include "adc_documento.h"
 #include "adc_render.h"
 #include "adc_json.h"
 
-#define ADC_VERSAO_TEXTO "AsciiDocConverter 0.1.0"
+#define ADC_VERSAO_TEXTO "AsciiDocConverter 0.2.0"
 
 static int32_t falhar(ADC_Arena* pArena, ADC_Mensagens* pMsgs, int32_t pCodigo, char** pMensagens) {
     if (pMensagens) {
@@ -21,9 +24,10 @@ static int32_t falhar(ADC_Arena* pArena, ADC_Mensagens* pMsgs, int32_t pCodigo, 
     return pCodigo;
 }
 
-ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int32_t pFormato,
+int32_t adc_converter_interno(const uint8_t* pEntradaUTF8, int32_t pTamanho, int32_t pFormato,
                               const char* pOpcoesJSON,
                               ADC_ResolverRecurso pResolver, void* pContextoResolver,
+                              const ADC_Extras* pExtras,
                               uint8_t** pSaida, int32_t* pTamanhoSaida, char** pMensagens) {
     if (pSaida) *pSaida = NULL;
     if (pTamanhoSaida) *pTamanhoSaida = 0;
@@ -31,6 +35,20 @@ ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int
 
     ADC_Arena arena; adc_arena_iniciar(&arena, 64 * 1024);
     ADC_Mensagens msgs; adc_msgs_iniciar(&msgs, &arena);
+    msgs.com_arquivo = pExtras && pExtras->com_arquivo;
+
+    /* As opções são lidas antes de qualquer mensagem, para o idioma valer também nos erros de parâmetro. */
+    ADC_Json* opcoes = NULL;
+    const char* erro_json = NULL; int32_t pos_erro_json = 0; bool json_invalido = false;
+    if (pOpcoesJSON && pOpcoesJSON[0]) {
+        opcoes = adc_json_ler(&arena, adc_fatia_cstr(pOpcoesJSON), &erro_json, &pos_erro_json);
+        if (!opcoes) json_invalido = true;
+        else {
+            const ADC_Json* id = adc_json_membro(opcoes, "idioma");
+            ADC_Idioma idioma;
+            if (id && id->tipo == ADC_JSON_TEXTO && adc_idioma_ler(id->texto, &idioma)) msgs.idioma = idioma;
+        }
+    }
 
     if (!pSaida || !pTamanhoSaida || (!pEntradaUTF8 && pTamanho > 0) || pTamanho < 0) {
         adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, 0, "ADC_Converter: parâmetro inválido (pSaida/pTamanhoSaida nulos, entrada nula com tamanho > 0, ou tamanho negativo).");
@@ -40,7 +58,7 @@ ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int
         adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, 0, "ADC_Converter: formato %d desconhecido. Válidos: 1=HTML5, 2=Markdown, 3=PDF, 4=ASG JSON, 5=DocBook 5.", (int)pFormato);
         return falhar(&arena, &msgs, ADC_ERRO_PARAMETRO, pMensagens);
     }
-    if (pFormato == ADC_DOCBOOK5) {
+    if (pFormato == ADC_DOCBOOK5 && !(pExtras && pExtras->permitir_docbook)) {
         adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, 0, "ADC_Converter: o formato DocBook 5 ainda não está implementado nesta versão (%s).", ADC_VERSAO_TEXTO);
         return falhar(&arena, &msgs, ADC_ERRO_FORMATO, pMensagens);
     }
@@ -56,22 +74,22 @@ ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int
         return falhar(&arena, &msgs, ADC_ERRO_ENTRADA, pMensagens);
     }
 
-    ADC_Json* opcoes = NULL;
-    if (pOpcoesJSON && pOpcoesJSON[0]) {
-        const char* erro = NULL; int32_t pos = 0;
-        opcoes = adc_json_ler(&arena, adc_fatia_cstr(pOpcoesJSON), &erro, &pos);
-        if (!opcoes) {
-            adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, pos + 1, "pOpcoesJSON inválido na posição %d: %s.", pos, erro ? erro : "JSON malformado");
-            return falhar(&arena, &msgs, ADC_ERRO_OPCOES, pMensagens);
-        }
+    if (json_invalido) {
+        adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, pos_erro_json + 1, "pOpcoesJSON inválido na posição %d: %s.", pos_erro_json, adc_msgs_tr(&msgs, erro_json ? erro_json : "JSON malformado"));
+        return falhar(&arena, &msgs, ADC_ERRO_OPCOES, pMensagens);
     }
 
     ADC_Contexto* ctx = ADC_NOVO(&arena, ADC_Contexto);
     if (!ctx) return falhar(&arena, &msgs, ADC_ERRO_MEMORIA, pMensagens);
     const char* erro_opcoes = NULL;
     if (!adc_doc_iniciar(ctx, &arena, opcoes, pResolver, pContextoResolver, &erro_opcoes)) {
-        adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, 0, "pOpcoesJSON: %s.", erro_opcoes ? erro_opcoes : "valor fora do domínio");
+        adc_msgs_adicionar(&msgs, ADC_NIVEL_ERRO, 0, 0, "pOpcoesJSON: %s.", adc_msgs_tr(&msgs, erro_opcoes ? erro_opcoes : "valor fora do domínio"));
         return falhar(&arena, &msgs, ADC_ERRO_OPCOES, pMensagens);
+    }
+    ctx->msgs.com_arquivo = msgs.com_arquivo;
+    if (pExtras) {
+        ctx->resolver2 = pExtras->resolver2; ctx->contexto_resolver2 = pExtras->contexto_resolver2;
+        ctx->leitor.resolver2 = pExtras->resolver2; ctx->leitor.contexto_resolver2 = pExtras->contexto_resolver2;
     }
     if (pTamanho > ctx->opcoes.tamanho_maximo) {
         adc_msgs_adicionar(&ctx->msgs, ADC_NIVEL_ERRO, 0, 0, "A entrada tem %d bytes e o limite é %d (limites.tamanhoMaximo). Divida o documento ou eleve o limite.", pTamanho, ctx->opcoes.tamanho_maximo);
@@ -92,6 +110,7 @@ ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int
         case ADC_MARKDOWN: adc_markdown_escrever(ctx, &saida); break;
         case ADC_ASG_JSON: adc_asg_escrever_documento(ctx, &saida); break;
         case ADC_PDF: ok = adc_pdf_escrever(ctx, &saida); break;
+        case ADC_DOCBOOK5: adc_docbook5_escrever(ctx, &saida); break;
         default: ok = false; break;
     }
     if (!ok) { adc_buffer_liberar(&saida); return falhar(&arena, &ctx->msgs, ADC_ERRO_CONVERSAO, pMensagens); }
@@ -109,6 +128,13 @@ ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int
     }
     adc_arena_liberar(&arena);
     return ADC_OK;
+}
+
+ADC_API int32_t ADC_Converter(const uint8_t* pEntradaUTF8, int32_t pTamanho, int32_t pFormato,
+                              const char* pOpcoesJSON,
+                              ADC_ResolverRecurso pResolver, void* pContextoResolver,
+                              uint8_t** pSaida, int32_t* pTamanhoSaida, char** pMensagens) {
+    return adc_converter_interno(pEntradaUTF8, pTamanho, pFormato, pOpcoesJSON, pResolver, pContextoResolver, NULL, pSaida, pTamanhoSaida, pMensagens);
 }
 
 ADC_API void ADC_Liberar(void* pMemoria) { free(pMemoria); }

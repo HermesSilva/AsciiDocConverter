@@ -381,7 +381,9 @@ bool adc_pdf_doc_finalizar(ADC_PdfDoc* pD, ADC_Buffer* pSaida) {
     if (pD->autor.tamanho) { adc_buffer_texto(S, " /Author "); adc_pdf_escrever_string_literal(S, pD->autor); }
     if (pD->assunto.tamanho) { adc_buffer_texto(S, " /Subject "); adc_pdf_escrever_string_literal(S, pD->assunto); }
     if (pD->palavras_chave.tamanho) { adc_buffer_texto(S, " /Keywords "); adc_pdf_escrever_string_literal(S, pD->palavras_chave); }
-    { time_t t = time(NULL); struct tm* tm = gmtime(&t); if (tm) { char d[96]; snprintf(d, sizeof d, " /CreationDate (D:%04d%02d%02d%02d%02d%02dZ)", (tm->tm_year + 1900) % 10000, (tm->tm_mon + 1) % 100, tm->tm_mday % 100, tm->tm_hour % 100, tm->tm_min % 100, tm->tm_sec % 100); adc_buffer_texto(S, d); } }
+    if (pD->data_definida) {
+        if (pD->data_criacao.tamanho) { adc_buffer_texto(S, " /CreationDate ("); adc_buffer_fatia(S, pD->data_criacao); adc_buffer_texto(S, ")"); }
+    } else { time_t t = time(NULL); struct tm* tm = gmtime(&t); if (tm) { char d[96]; snprintf(d, sizeof d, " /CreationDate (D:%04d%02d%02d%02d%02d%02dZ)", (tm->tm_year + 1900) % 10000, (tm->tm_mon + 1) % 100, tm->tm_mday % 100, tm->tm_hour % 100, tm->tm_min % 100, tm->tm_sec % 100); adc_buffer_texto(S, d); } }
     adc_buffer_texto(S, " >>");
     fim_objeto(pD);
     /* catálogo */

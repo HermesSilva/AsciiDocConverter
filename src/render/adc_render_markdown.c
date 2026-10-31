@@ -24,12 +24,13 @@ static void recuo(M* m) { adc_buffer_repetir(m->b, ' ', m->indent); }
 /* Registra uma degradação: pFrase é a frase completa, no pretérito, sem "Markdown:" na frente. */
 static void degradar(M* m, const ADC_Bloco* b, const char* pFrase) {
     m->avisos++;
-    adc_msgs_adicionar(&m->ctx->msgs, ADC_NIVEL_AVISO, b ? b->local.inicio.linha : 0, b ? b->local.inicio.coluna : 0, "Markdown: %s", pFrase);
+    adc_msgs_adicionar(&m->ctx->msgs, ADC_NIVEL_AVISO, b ? b->local.inicio.linha : 0, b ? b->local.inicio.coluna : 0, "Markdown: %s", adc_msgs_tr(&m->ctx->msgs, pFrase));
 }
 
 static void degradar_sem_equivalente(M* m, const ADC_Bloco* b, const char* pQue) {
     char frase[256];
-    snprintf(frase, sizeof frase, "%s não tem equivalente em GFM e foi %s.", pQue, m->html ? "emitido como HTML embutido" : "reduzido a texto");
+    const ADC_Mensagens* ms = &m->ctx->msgs;
+    snprintf(frase, sizeof frase, adc_msgs_tr(ms, "%s não tem equivalente em GFM e foi %s."), adc_msgs_tr(ms, pQue), adc_msgs_tr(ms, m->html ? "emitido como HTML embutido" : "reduzido a texto"));
     degradar(m, b, frase);
 }
 

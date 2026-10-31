@@ -91,9 +91,18 @@ código do Asciidoctor (Asciidoctor.js 3.0.4 = Asciidoctor 2.0.20) e tem caso no
 Esses nomes **não estão no esquema** `asg/schema.json` (draft-01), que ainda não cobre tabelas nem rodapés; quando
 a especificação os definir, a saída muda para a forma oficial e esta tabela é atualizada.
 
-## Não implementado nesta versão (0.1.0)
+## Não implementado nesta versão (0.2.0)
 
-- DocBook 5 (`ADC_DOCBOOK5` devolve `ADC_ERRO_FORMATO` com mensagem).
+- DocBook 5 **pela ABI nativa** (`ADC_DOCBOOK5` devolve `ADC_ERRO_FORMATO` com mensagem — DAD-9). Pela entrada
+  WebAssembly (`wasm/`) ele existe desde 2026-10-31 (`src/render/adc_render_docbook5.c`), na estrutura do conversor
+  docbook5 do Asciidoctor; **ainda sem oráculo** — a comparação com `asciidoctor -b docbook5` sobre o corpus é a
+  próxima etapa (hoje a prova é o teste da extensão do VS Code sobre um documento com includes, imagem e tabela).
+  Simplificações conhecidas: `[horizontal]` sai como `<variablelist role="horizontal">` (o Asciidoctor usa uma
+  `informaltable`), STEM sai em `<mathphrase>` sem MathML, e o preâmbulo de `article` fica solto (o Asciidoctor
+  também), enquanto o de `book` vira `<preface>`.
+- Folha de estilo personalizada e `data-uri` **pelo atributo do documento**: existem só como OPÇÕES da API
+  (`folhaDeEstilo`, `dataUri` — DAD-12), porque o atributo mudaria a saída de quem já chama a nativa com documentos
+  que o definem (DAD-9).
 - `rowspan` no PDF (as células com `rowspan` ocupam só a própria linha; a mescla sai certa no HTML).
 - `toc::[]` no PDF (o PDF põe o sumário no início; no HTML ele sai no lugar do macro com `:toc: macro`, como no Asciidoctor; o Markdown omite com aviso).
 - Divergências restantes no corpus real (547 documentos em 2026-10-24): log em `d:\tmp\AsciiDocConverter\validacao\rodada12.csv`;

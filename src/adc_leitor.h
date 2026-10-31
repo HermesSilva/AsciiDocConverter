@@ -12,6 +12,18 @@
 #include "adc_mensagens.h"
 #include "../include/adc.h"
 
+/*
+ * Resolvedor v2 (DAD-11, 2026-10-31): além do alvo, recebe a ORIGEM — o caminho do arquivo que contém a diretiva
+ * (vazio no documento principal) — e devolve o caminho RESOLVIDO, que o leitor registra como origem dos includes
+ * aninhados. Só a entrada WebAssembly o usa; a ABI nativa segue com ADC_ResolverRecurso, intacta.
+ * pCaminhoResolvido/pTamanhoResolvido podem ficar sem preencher (vale o alvo como veio).
+ */
+typedef int32_t (*ADC_ResolverRecurso2)(void* pContexto, int32_t pTipo,
+                                        const char* pCaminho, int32_t pTamanhoCaminho,
+                                        const char* pOrigem, int32_t pTamanhoOrigem,
+                                        const uint8_t** pConteudo, int32_t* pTamanho,
+                                        const char** pCaminhoResolvido, int32_t* pTamanhoResolvido);
+
 typedef struct ADC_Linha {
     ADC_Fatia  texto;      /* sem o terminador de linha                                        */
     int32_t    numero;     /* 1-based no arquivo de origem                                     */
@@ -42,6 +54,8 @@ typedef struct ADC_Leitor {
     ADC_Mensagens*        msgs;
     ADC_ResolverRecurso   resolver;
     void*                 contexto_resolver;
+    ADC_ResolverRecurso2  resolver2;                /* tem precedência quando definido                */
+    void*                 contexto_resolver2;
     ADC_Fonte             pilha[ADC_LEITOR_MAX_FONTES];
     int32_t               topo;                     /* -1 = sem fonte                           */
     ADC_Arquivo*          arquivos;                 /* lista: índice → caminho                   */

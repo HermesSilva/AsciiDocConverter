@@ -26,6 +26,14 @@ ADC_Fatia adc_leitor_caminho(const ADC_Leitor* pL, int32_t pIndice) {
     return adc_fatia(NULL, 0);
 }
 
+/* As mensagens lembram o arquivo em leitura (DAD-11): atualizado a cada entrada e saída de fonte. */
+static void atualizar_arquivo_corrente(ADC_Leitor* pL) {
+    if (!pL->msgs) return;
+    if (pL->topo < 0) { pL->msgs->arquivo_corrente = NULL; return; }
+    ADC_Fatia caminho = adc_leitor_caminho(pL, pL->pilha[pL->topo].arquivo);
+    pL->msgs->arquivo_corrente = caminho.tamanho > 0 ? adc_arena_cstr(pL->arena, caminho) : NULL;
+}
+
 static bool empilhar(ADC_Leitor* pL, ADC_Fatia pTexto, int32_t pArquivo, int32_t pLevelOffset) {
     if (pL->topo + 1 >= ADC_LEITOR_MAX_FONTES) return false;
     ADC_Fonte* f = &pL->pilha[++pL->topo];
@@ -34,6 +42,7 @@ static bool empilhar(ADC_Leitor* pL, ADC_Fatia pTexto, int32_t pArquivo, int32_t
     f->vazia_antes = false; f->vazia_depois = false;
     f->profundidade_condicional_ao_entrar = pL->profundidade_condicional;
     pL->leveloffset += pLevelOffset;
+    atualizar_arquivo_corrente(pL);
     return true;
 }
 
@@ -63,6 +72,7 @@ static bool linha_crua(ADC_Leitor* pL, ADC_Linha* pLinha) {
             }
             pL->leveloffset -= f->nivel_offset;
             pL->topo--;
+            atualizar_arquivo_corrente(pL);
             continue;
         }
         int32_t ini = f->pos;
@@ -296,7 +306,7 @@ static ADC_Fatia fazer_include(ADC_Leitor* pL, ADC_Fatia pAlvo, ADC_Fatia pAttrs
             "Limite de %d includes atingido: include::%.*s[] foi ignorado.", pL->includes_maximo, alvo.tamanho, alvo.dados);
         return nada;
     }
-    if (!pL->resolver) {
+    if (!pL->resolver && !pL->resolver2) {
         adc_msgs_adicionar(pL->msgs, ADC_NIVEL_AVISO, pLinha->numero, 1,
             "include::%.*s[] negado: a conversão está em modo seguro, sem resolvedor de recursos registrado pelo chamador.", alvo.tamanho, alvo.dados);
         return nada;
@@ -307,7 +317,13 @@ static ADC_Fatia fazer_include(ADC_Leitor* pL, ADC_Fatia pAlvo, ADC_Fatia pAttrs
         return nada;
     }
     const uint8_t* conteudo = NULL; int32_t tamanho = 0;
-    int32_t rc = pL->resolver(pL->contexto_resolver, 1, alvo.dados, alvo.tamanho, &conteudo, &tamanho);
+    const char* resolvido = NULL; int32_t tam_resolvido = 0;
+    int32_t rc;
+    if (pL->resolver2) {
+        /* v2: a origem é o arquivo que contém a diretiva — é o que resolve include relativo dentro de include */
+        ADC_Fatia origem = adc_leitor_caminho(pL, pLinha->arquivo);
+        rc = pL->resolver2(pL->contexto_resolver2, 1, alvo.dados, alvo.tamanho, origem.dados ? origem.dados : "", origem.tamanho, &conteudo, &tamanho, &resolvido, &tam_resolvido);
+    } else rc = pL->resolver(pL->contexto_resolver, 1, alvo.dados, alvo.tamanho, &conteudo, &tamanho);
     if (rc != 0 || !conteudo || tamanho < 0) {
         adc_msgs_adicionar(pL->msgs, ADC_NIVEL_ERRO, pLinha->numero, 1,
             "include::%.*s[] não encontrado ou negado pelo chamador (código %d): o conteúdo não foi incluído; no lugar sai a linha \"Unresolved directive\", como no Asciidoctor.", alvo.tamanho, alvo.dados, (int)rc);
@@ -403,7 +419,13 @@ static ADC_Fatia fazer_include(ADC_Leitor* pL, ADC_Fatia pAlvo, ADC_Fatia pAttrs
         int32_t tam; uint8_t* d = adc_buffer_entregar(&b, &tam);
         if (d) { char* c = adc_arena_copiar(pL->arena, (const char*)d, tam); free(d); if (c) texto = adc_fatia(c, tam); }
     }
-    int32_t idx = registrar_arquivo(pL, alvo);
+    /* o caminho registrado é o RESOLVIDO quando o resolvedor v2 o deu: é ele que vira a origem dos includes de dentro */
+    ADC_Fatia caminho_registrado = alvo;
+    if (resolvido && tam_resolvido > 0) {
+        char* copia = adc_arena_copiar(pL->arena, resolvido, tam_resolvido);
+        if (copia) caminho_registrado = adc_fatia(copia, tam_resolvido);
+    }
+    int32_t idx = registrar_arquivo(pL, caminho_registrado);
     if (empilhar(pL, texto, idx, leveloffset) && tem_leveloffset) { pL->pilha[pL->topo].vazia_antes = true; pL->pilha[pL->topo].vazia_depois = true; }
     return nada;
 }

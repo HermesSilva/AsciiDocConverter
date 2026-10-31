@@ -7,6 +7,7 @@
 *.ttf binary
 *.dll binary
 *.so binary
+*.wasm binary
 *.png binary
 *.jpg binary
 # Casos e golden: LF sempre (o TCK e o golden comparam texto).
