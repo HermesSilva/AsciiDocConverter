@@ -66,6 +66,10 @@ typedef struct ADC_PdfDoc {
     ADC_PdfMarcador* marcadores;
     ADC_PdfMarcador* ultimo_marcador;
     ADC_Fatia        titulo, autor, assunto, palavras_chave;
+    /* /CreationDate: sem `data_definida`, o relógio (como sempre); com ela, o texto dado (D:AAAAMMDDHHmmSSZ) ou,
+       vazio, nenhuma data — saída reproduzível (DAD-12). */
+    bool             data_definida;
+    ADC_Fatia        data_criacao;
     bool             comprimir;
     bool             falhou;
     const char*      erro;

@@ -35,6 +35,43 @@ static void blocos(H* h, const ADC_Bloco* pPrimeiro);
 static void esc(H* h, ADC_Fatia t) { adc_html_escapar(h->b, t); }
 static void txt(H* h, const char* t) { adc_buffer_texto(h->b, t); }
 
+/* Tipo MIME de uma imagem pelos bytes (assinatura) ou, sem assinatura conhecida, pela extensão. */
+static const char* mime_da_imagem(ADC_Fatia pAlvo, const uint8_t* pBytes, int32_t pTam) {
+    if (pTam >= 8 && pBytes[0] == 0x89 && pBytes[1] == 'P' && pBytes[2] == 'N' && pBytes[3] == 'G') return "image/png";
+    if (pTam >= 3 && pBytes[0] == 0xFF && pBytes[1] == 0xD8) return "image/jpeg";
+    if (pTam >= 6 && memcmp(pBytes, "GIF8", 4) == 0) return "image/gif";
+    if (pTam >= 12 && memcmp(pBytes, "RIFF", 4) == 0 && memcmp(pBytes + 8, "WEBP", 4) == 0) return "image/webp";
+    if (adc_fatia_termina(pAlvo, ".svg") || adc_fatia_termina(pAlvo, ".SVG")) return "image/svg+xml";
+    if (adc_fatia_termina(pAlvo, ".bmp") || adc_fatia_termina(pAlvo, ".BMP")) return "image/bmp";
+    if (adc_fatia_termina(pAlvo, ".ico")) return "image/x-icon";
+    if (adc_fatia_termina(pAlvo, ".avif")) return "image/avif";
+    return "application/octet-stream";
+}
+
+/* O valor de src de uma imagem: o caminho (com imagesdir, como sempre) ou, com a opção dataUri (DAD-12), os bytes
+   pedidos ao resolvedor (tipo 2) em base64. Negado ou sem resolvedor: aviso e o caminho — a imagem nunca some. */
+static void src_imagem(H* h, ADC_Fatia pAlvo, int32_t pLinha) {
+    ADC_Fatia dir;
+    bool remoto = adc_fatia_comeca(pAlvo, "http") || adc_fatia_comeca(pAlvo, "data:");
+    bool com_dir = adc_atribs_obter_cstr(&h->ctx->atribs, "imagesdir", &dir) && dir.tamanho && !adc_fatia_comeca(pAlvo, "http") && !adc_fatia_comeca(pAlvo, "/");
+    if (h->ctx->opcoes.data_uri && !remoto && adc_ctx_tem_resolvedor(h->ctx)) {
+        ADC_Buffer caminho; adc_buffer_iniciar(&caminho);
+        if (com_dir) { adc_buffer_fatia(&caminho, dir); adc_buffer_char(&caminho, '/'); }
+        adc_buffer_fatia(&caminho, pAlvo);
+        const uint8_t* bytes = NULL; int32_t tam = 0;
+        int32_t rc = adc_ctx_resolver_recurso(h->ctx, 2, adc_buffer_fatia_de(&caminho), &bytes, &tam);
+        adc_buffer_liberar(&caminho);
+        if (rc == 0 && bytes && tam > 0) {
+            txt(h, "data:"); txt(h, mime_da_imagem(pAlvo, bytes, tam)); txt(h, ";base64,");
+            adc_base64_escrever(h->b, bytes, tam);
+            return;
+        }
+        adc_msgs_adicionar(&h->ctx->msgs, ADC_NIVEL_AVISO, pLinha, 0, "HTML5: a imagem '%.*s' não foi entregue pelo resolvedor de recursos (código %d); ficou referenciada pelo caminho em vez de embutida (data-uri).", pAlvo.tamanho, pAlvo.dados, (int)rc);
+    }
+    if (com_dir) { adc_html_escapar_atributo(h->b, dir); txt(h, "/"); }
+    adc_html_escapar_atributo(h->b, pAlvo);
+}
+
 static void id_e_classe(H* h, const ADC_Bloco* b, const char* pClasse) {
     if (b->meta.id.tamanho) { txt(h, " id=\""); adc_html_escapar_atributo(h->b, b->meta.id); txt(h, "\""); }
     txt(h, " class=\""); txt(h, pClasse);
@@ -143,8 +180,8 @@ static void inline_um(H* h, const ADC_Inline* i) {
             ADC_Fatia role = adc_atributo_obter(i->atributos, "role", &a); bool tem_role = a;
             txt(h, "<span class=\"image"); if (tem_role) { txt(h, " "); esc(h, role); } txt(h, "\">");
             if (tem_link) { txt(h, "<a class=\"image\" href=\""); adc_html_escapar_atributo(h->b, link); txt(h, "\">"); }
-            txt(h, "<img src=\""); { ADC_Fatia dir; if (adc_atribs_obter_cstr(&h->ctx->atribs, "imagesdir", &dir) && dir.tamanho && !adc_fatia_comeca(i->alvo, "http") && !adc_fatia_comeca(i->alvo, "/") ) { adc_html_escapar_atributo(h->b, dir); txt(h, "/"); } }
-            adc_html_escapar_atributo(h->b, i->alvo); txt(h, "\" alt=\""); adc_html_escapar_atributo(h->b, alt); txt(h, "\"");
+            txt(h, "<img src=\""); src_imagem(h, i->alvo, i->local.inicio.linha);
+            txt(h, "\" alt=\""); adc_html_escapar_atributo(h->b, alt); txt(h, "\"");
             ADC_Fatia w = adc_atributo_obter(i->atributos, "width", &a); if (a) { txt(h, " width=\""); esc(h, w); txt(h, "\""); }
             ADC_Fatia ht = adc_atributo_obter(i->atributos, "height", &a); if (a) { txt(h, " height=\""); esc(h, ht); txt(h, "\""); }
             ADC_Fatia ti = adc_atributo_obter(i->atributos, "title", &a); if (a) { txt(h, " title=\""); adc_html_escapar_atributo(h->b, ti); txt(h, "\""); }
@@ -496,9 +533,8 @@ static void imagem_bloco(H* h, const ADC_Bloco* b) {
     for (int32_t k = 0; k < b->meta.papeis.quantidade; k++) { txt(h, " "); esc(h, b->meta.papeis.itens[k]); }
     txt(h, "\">\n<div class=\"content\">\n");
     if (tem_link) { txt(h, "<a class=\"image\" href=\""); adc_html_escapar_atributo(h->b, link); txt(h, "\">"); }
-    txt(h, "<img src=\"");
-    { ADC_Fatia dir; if (adc_atribs_obter_cstr(&h->ctx->atribs, "imagesdir", &dir) && dir.tamanho && !adc_fatia_comeca(b->alvo, "http") && !adc_fatia_comeca(b->alvo, "/")) { adc_html_escapar_atributo(h->b, dir); txt(h, "/"); } }
-    adc_html_escapar_atributo(h->b, b->alvo); txt(h, "\" alt=\""); adc_html_escapar_atributo(h->b, alt); txt(h, "\"");
+    txt(h, "<img src=\""); src_imagem(h, b->alvo, b->local.inicio.linha);
+    txt(h, "\" alt=\""); adc_html_escapar_atributo(h->b, alt); txt(h, "\"");
     ADC_Fatia w = adc_atributo_obter(b->meta.atributos, "width", &a); if (a) { txt(h, " width=\""); esc(h, w); txt(h, "\""); }
     ADC_Fatia ht = adc_atributo_obter(b->meta.atributos, "height", &a); if (a) { txt(h, " height=\""); esc(h, ht); txt(h, "\""); }
     ADC_Fatia ti = adc_atributo_obter(b->meta.atributos, "title", &a); if (a && false) { txt(h, " title=\""); adc_html_escapar_atributo(h->b, ti); txt(h, "\""); }
@@ -742,9 +778,20 @@ static void cabecalho_html(H* h, ADC_Fatia pTitulo) {
         txt(h, "<link rel=\"stylesheet\" href=\""); adc_html_escapar_atributo(h->b, adc_atribs_valor_ou(at, "stylesdir", "."));
         txt(h, "/"); adc_html_escapar_atributo(h->b, adc_atribs_valor_ou(at, "stylesheet", "asciidoctor.css")); txt(h, "\">\n");
     } else {
-        if (adc_atribs_obter_cstr(at, "stylesheet", &v) && v.tamanho)
-            adc_msgs_adicionar(&h->ctx->msgs, ADC_NIVEL_AVISO, 0, 0, "HTML5: a folha de estilo personalizada '%.*s' (:stylesheet:) não foi lida, porque a biblioteca não acessa o disco; a folha padrão do Asciidoctor foi embutida no lugar. Para referenciá-la por URL, defina :linkcss:.", (int)v.tamanho, v.dados);
-        txt(h, "<style>\n"); adc_buffer_bytes(h->b, adc_css_asciidoctor, adc_css_asciidoctor_tamanho); txt(h, "</style>\n");
+        /* Opção folhaDeEstilo (DAD-12): o CSS vem do resolvedor (tipo 3) e entra no lugar da folha padrão. */
+        bool embutida = false;
+        ADC_Fatia propria = h->ctx->opcoes.folha_de_estilo;
+        if (propria.tamanho && adc_ctx_tem_resolvedor(h->ctx)) {
+            const uint8_t* css = NULL; int32_t tam = 0;
+            int32_t rc = adc_ctx_resolver_recurso(h->ctx, 3, propria, &css, &tam);
+            if (rc == 0 && css && tam > 0) { txt(h, "<style>\n"); adc_buffer_bytes(h->b, css, tam); if (css[tam - 1] != '\n') txt(h, "\n"); txt(h, "</style>\n"); embutida = true; }
+            else adc_msgs_adicionar(&h->ctx->msgs, ADC_NIVEL_AVISO, 0, 0, "HTML5: a folha de estilo '%.*s' (opção folhaDeEstilo) não foi entregue pelo resolvedor de recursos (código %d); a folha padrão do Asciidoctor foi embutida no lugar.", (int)propria.tamanho, propria.dados, (int)rc);
+        }
+        if (!embutida) {
+            if (adc_atribs_obter_cstr(at, "stylesheet", &v) && v.tamanho)
+                adc_msgs_adicionar(&h->ctx->msgs, ADC_NIVEL_AVISO, 0, 0, "HTML5: a folha de estilo personalizada '%.*s' (:stylesheet:) não foi lida, porque a biblioteca não acessa o disco; a folha padrão do Asciidoctor foi embutida no lugar. Para referenciá-la por URL, defina :linkcss:.", (int)v.tamanho, v.dados);
+            txt(h, "<style>\n"); adc_buffer_bytes(h->b, adc_css_asciidoctor, adc_css_asciidoctor_tamanho); txt(h, "</style>\n");
+        }
     }
     if (h->icons_font) {
         txt(h, "<link rel=\"stylesheet\" href=\"");

@@ -294,12 +294,12 @@ static void inline_em_atomos(R* r, Atomos* A, const ADC_Inline* i, Estilo E) {
             bool a; ADC_Fatia alt = adc_atributo_obter(i->atributos, "alt", &a);
             int32_t lw = 0, lh = 0;
             int32_t idx = adc_pdf_doc_imagem_por_chave(&r->doc, i->alvo, &lw, &lh);
-            if (idx < 0 && r->ctx->resolver) {
+            if (idx < 0 && adc_ctx_tem_resolvedor(r->ctx)) {
                 const uint8_t* bytes; int32_t tam;
-                if (r->ctx->resolver(r->ctx->contexto_resolver, 2, i->alvo.dados, i->alvo.tamanho, &bytes, &tam) == 0 && bytes) {
+                if (adc_ctx_resolver_recurso(r->ctx, 2, i->alvo, &bytes, &tam) == 0 && bytes) {
                     ADC_ImagemDecodificada im;
                     if (adc_imagem_decodificar(bytes, tam, &im)) { idx = adc_pdf_doc_imagem(&r->doc, i->alvo, im.largura, im.altura, im.componentes, im.pixels, im.tamanho_pixels, im.alpha, im.tamanho_alpha, im.dct, im.cmyk_invertido); lw = im.largura; lh = im.altura; adc_imagem_liberar(&im); }
-                    else adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, i->local.inicio.linha, i->local.inicio.coluna, "PDF: imagem inline '%.*s' não pôde ser decodificada (%s); o texto alternativo foi usado.", i->alvo.tamanho, i->alvo.dados, im.erro ? im.erro : "?");
+                    else adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, i->local.inicio.linha, i->local.inicio.coluna, "PDF: imagem inline '%.*s' não pôde ser decodificada (%s); o texto alternativo foi usado.", i->alvo.tamanho, i->alvo.dados, adc_msgs_tr(&r->ctx->msgs, im.erro ? im.erro : "?"));
                 }
             }
             if (idx >= 0 && lw > 0 && lh > 0) {
@@ -866,13 +866,13 @@ static void imagem_bloco(R* r, const ADC_Bloco* b) {
         ADC_Fatia alvo = b->alvo;
         ADC_Fatia dir; ADC_Buffer caminho; adc_buffer_iniciar(&caminho);
         if (adc_atribs_obter_cstr(&r->ctx->atribs, "imagesdir", &dir) && dir.tamanho && !adc_fatia_comeca(alvo, "/") && !adc_fatia_comeca(alvo, "http")) { adc_buffer_fatia(&caminho, dir); adc_buffer_char(&caminho, '/'); adc_buffer_fatia(&caminho, alvo); alvo = adc_fatia((const char*)caminho.dados, caminho.tamanho); }
-        if (r->ctx->resolver(r->ctx->contexto_resolver, 2, alvo.dados, alvo.tamanho, &bytes, &tam) == 0 && bytes) {
+        if (adc_ctx_resolver_recurso(r->ctx, 2, alvo, &bytes, &tam) == 0 && bytes) {
             ADC_ImagemDecodificada im;
             if (adc_imagem_decodificar(bytes, tam, &im)) { idx = adc_pdf_doc_imagem(&r->doc, b->alvo, im.largura, im.altura, im.componentes, im.pixels, im.tamanho_pixels, im.alpha, im.tamanho_alpha, im.dct, im.cmyk_invertido); lw = im.largura; lh = im.altura; adc_imagem_liberar(&im); }
-            else if (r->avisar) adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, b->local.inicio.linha, 1, "PDF: a imagem '%.*s' não pôde ser decodificada (%s); o texto alternativo foi usado.", b->alvo.tamanho, b->alvo.dados, im.erro ? im.erro : "?");
-        } else if (r->avisar) adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, b->local.inicio.linha, 1, "PDF: a imagem '%.*s' não foi entregue pelo resolvedor de recursos (%s); o texto alternativo foi usado.", b->alvo.tamanho, b->alvo.dados, r->ctx->resolver ? "negada" : "sem resolvedor");
+            else if (r->avisar) adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, b->local.inicio.linha, 1, "PDF: a imagem '%.*s' não pôde ser decodificada (%s); o texto alternativo foi usado.", b->alvo.tamanho, b->alvo.dados, adc_msgs_tr(&r->ctx->msgs, im.erro ? im.erro : "?"));
+        } else if (r->avisar) adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, b->local.inicio.linha, 1, "PDF: a imagem '%.*s' não foi entregue pelo resolvedor de recursos (%s); o texto alternativo foi usado.", b->alvo.tamanho, b->alvo.dados, adc_msgs_tr(&r->ctx->msgs, adc_ctx_tem_resolvedor(r->ctx) ? "negada" : "sem resolvedor"));
         adc_buffer_liberar(&caminho);
-    } else if (idx < 0 && !r->ctx->resolver && !r->medir && r->avisar) adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, b->local.inicio.linha, 1, "PDF: a imagem '%.*s' não foi incluída: não há resolvedor de recursos registrado (modo seguro).", b->alvo.tamanho, b->alvo.dados);
+    } else if (idx < 0 && !adc_ctx_tem_resolvedor(r->ctx) && !r->medir && r->avisar) adc_msgs_adicionar(&r->ctx->msgs, ADC_NIVEL_AVISO, b->local.inicio.linha, 1, "PDF: a imagem '%.*s' não foi incluída: não há resolvedor de recursos registrado (modo seguro).", b->alvo.tamanho, b->alvo.dados);
     if (idx >= 0 && lw > 0 && lh > 0) {
         ADC_Fatia w = adc_atributo_obter(b->meta.atributos, "width", &a);
         double larg = a ? adc_fatia_para_int(w, 0) * 0.75 : lw * 0.75;
@@ -1081,6 +1081,7 @@ static void notas(R* r) {
 
 static void renderizar_tudo(R* r, bool pComSumario, int32_t pNiveisToc) {
     adc_pdf_doc_iniciar(&r->doc, r->ctx->arena);
+    r->doc.data_definida = r->ctx->opcoes.pdf_data_definida; r->doc.data_criacao = r->ctx->opcoes.pdf_data_criacao;
     r->n_fontes = 0;
     r->pagina = -1; r->n_toc = 0; memset(r->contadores, 0, sizeof r->contadores);
     r->cont_figura = r->cont_tabela = r->cont_exemplo = 0; r->ctx->contador_listing = 0;
@@ -1135,6 +1136,7 @@ bool adc_pdf_escrever(ADC_Contexto* pC, ADC_Buffer* pSaida) {
         /* os itens do sumário colhidos na passagem 1 continuam válidos: o corpo não muda de leiaute,
            só desloca em paginas_toc páginas */
         adc_pdf_doc_iniciar(&r.doc, pC->arena);
+        r.doc.data_definida = pC->opcoes.pdf_data_definida; r.doc.data_criacao = pC->opcoes.pdf_data_criacao;
         r.n_fontes = 0; r.pagina = -1; memset(r.contadores, 0, sizeof r.contadores);
         r.cont_figura = r.cont_tabela = r.cont_exemplo = 0; pC->contador_listing = 0;
         r.x_esq = r.T.margem_esq; r.largura = area_largura(&r);
@@ -1153,7 +1155,7 @@ bool adc_pdf_escrever(ADC_Contexto* pC, ADC_Buffer* pSaida) {
     rodapes(&r);
     ADC_Buffer saida;
     if (!adc_pdf_doc_finalizar(&r.doc, &saida)) {
-        adc_msgs_adicionar(&pC->msgs, ADC_NIVEL_ERRO, 0, 0, "PDF: %s.", r.doc.erro ? r.doc.erro : "falha ao finalizar o arquivo");
+        adc_msgs_adicionar(&pC->msgs, ADC_NIVEL_ERRO, 0, 0, "PDF: %s.", adc_msgs_tr(&pC->msgs, r.doc.erro ? r.doc.erro : "falha ao finalizar o arquivo"));
         adc_pdf_doc_liberar(&r.doc); free(r.toc_itens); return false;
     }
     adc_pdf_doc_liberar(&r.doc);

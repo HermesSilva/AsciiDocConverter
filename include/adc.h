@@ -64,7 +64,11 @@ typedef enum ADC_Resultado {
  * ou outro valor para negar — a negação vira aviso no documento, nunca silêncio. Sem callback
  * registrado, todo pedido é negado (modo seguro).
  *
- * pTipo: 1 = include (texto AsciiDoc, UTF-8), 2 = imagem (bytes brutos).
+ * pTipo: 1 = include (texto AsciiDoc, UTF-8), 2 = imagem (bytes brutos), 3 = folha de estilo (bytes, opção folhaDeEstilo).
+ *
+ * O alvo chega como escrito no documento, sem dizer de que arquivo veio: include relativo dentro de include é do
+ * chamador resolver (o Converter-Adoc.ps1 faz isso). A entrada WebAssembly (wasm/) usa um resolvedor v2, com a origem
+ * e o caminho resolvido — só ela, para esta ABI não mudar (DAD-9/DAD-11).
  */
 typedef int32_t (*ADC_ResolverRecurso)(void* pContexto, int32_t pTipo,
                                        const char* pCaminho, int32_t pTamanhoCaminho,
@@ -77,8 +81,14 @@ typedef int32_t (*ADC_ResolverRecurso)(void* pContexto, int32_t pTipo,
  *   "atributos":  { "nome": "valor", ... }   atributos do documento (como -a da linha de comando)
  *   "autonomo":   true|false                 HTML5: documento completo (true) ou só o corpo (false, padrão)
  *   "markdown":   { "htmlEmbutido": true }   política de degradação (DAD-3)
- *   "pdf":        { ...tema... }             sobrescrita do tema padrão (DAD-8)
+ *   "pdf":        { ...tema... }             sobrescrita do tema padrão (DAD-8); "dataDeCriacao": "D:AAAAMMDDHHmmSSZ" fixa
+ *                                            a data do PDF ("" = sem data) — saída reproduzível (DAD-12)
  *   "limites":    { "tamanhoMaximo": n, "aninhamentoMaximo": n, "includesMaximo": n }   (includes: total, padrão 10000)
+ *   "idioma":     "en" | "pt-BR"             idioma das MENSAGENS; sem a opção, inglês (DAD-10, 2026-10-31)
+ *   "dataUri":    true|false                 HTML5: imagens embutidas em base64, pedidas ao resolvedor (tipo 2) (DAD-12)
+ *   "folhaDeEstilo": "caminho.css"           HTML5 autônomo: CSS pedido ao resolvedor (tipo 3) no lugar da folha padrão
+ *
+ * pTipo do resolvedor: 1 = include (texto AsciiDoc, UTF-8), 2 = imagem (bytes), 3 = folha de estilo (bytes).
  *
  * pSaida/pTamanhoSaida: a saída (texto UTF-8 sem terminador para HTML/Markdown/ASG; bytes para PDF).
  * pMensagens: JSON — array de { "nivel": "aviso"|"erro", "linha": n, "coluna": n, "texto": "..." },

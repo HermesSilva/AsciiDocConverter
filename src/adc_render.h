@@ -23,6 +23,11 @@ void adc_markdown_escrever(ADC_Contexto* pC, ADC_Buffer* pSaida);
 /* PDF (escritor próprio). Devolve false em falha (mensagem já registrada). */
 bool adc_pdf_escrever(ADC_Contexto* pC, ADC_Buffer* pSaida);
 
+/* DocBook 5 (estrutura do conversor docbook5 do Asciidoctor). Só a entrada WebAssembly o alcança (DAD-9). */
+void adc_docbook5_escrever(ADC_Contexto* pC, ADC_Buffer* pSaida);
+/* Escapa &, <, > e aspas para XML. */
+void adc_xml_escapar(ADC_Buffer* pB, ADC_Fatia pTexto);
+
 /* Utilidades compartilhadas pelos renderizadores. */
 /* Numeração de seção "1.2.3" escrita em pB (sectnums). */
 void adc_render_numero_secao(ADC_Buffer* pB, const int32_t* pContadores, int32_t pNivel);

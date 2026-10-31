@@ -143,3 +143,16 @@ ADC_NotaRodape* adc_ctx_achar_nota(ADC_Contexto* pC, ADC_Fatia pId) {
     for (ADC_NotaRodape* n = pC->notas; n; n = n->proxima) if (adc_fatia_igual_f(n->id, pId)) return n;
     return NULL;
 }
+
+bool adc_ctx_tem_resolvedor(const ADC_Contexto* pC) { return pC->resolver != NULL || pC->resolver2 != NULL; }
+
+int32_t adc_ctx_resolver_recurso(ADC_Contexto* pC, int32_t pTipo, ADC_Fatia pCaminho, const uint8_t** pConteudo, int32_t* pTamanho) {
+    *pConteudo = NULL; *pTamanho = 0;
+    if (pC->resolver2) {
+        const char* resolvido = NULL; int32_t tam = 0;
+        ADC_Fatia origem = adc_leitor_caminho(&pC->leitor, 0);
+        return pC->resolver2(pC->contexto_resolver2, pTipo, pCaminho.dados, pCaminho.tamanho, origem.dados ? origem.dados : "", origem.tamanho, pConteudo, pTamanho, &resolvido, &tam);
+    }
+    if (pC->resolver) return pC->resolver(pC->contexto_resolver, pTipo, pCaminho.dados, pCaminho.tamanho, pConteudo, pTamanho);
+    return -1;
+}

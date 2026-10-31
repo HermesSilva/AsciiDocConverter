@@ -26,6 +26,18 @@ bool adc_doc_iniciar(ADC_Contexto* pC, ADC_Arena* pArena, const ADC_Json* pOpcoe
             v = adc_json_numero(lim, "includesMaximo", pC->opcoes.includes_maximo); if (v >= 0 && v <= 100000) pC->opcoes.includes_maximo = (int32_t)v;
         }
         pC->opcoes.pdf_tema = adc_json_membro(pOpcoes, "pdf");
+        /* opções de 2026-10-31 (DAD-10..12) — todas opcionais */
+        pC->opcoes.data_uri = adc_json_bool(pOpcoes, "dataUri", false);
+        pC->opcoes.folha_de_estilo = adc_json_texto(pOpcoes, "folhaDeEstilo", "");
+        {
+            const ADC_Json* d = pC->opcoes.pdf_tema ? adc_json_membro(pC->opcoes.pdf_tema, "dataDeCriacao") : NULL;
+            if (d && d->tipo == ADC_JSON_TEXTO) { pC->opcoes.pdf_data_definida = true; pC->opcoes.pdf_data_criacao = d->texto; }
+        }
+        {
+            const ADC_Json* id = adc_json_membro(pOpcoes, "idioma");
+            if (id && (id->tipo != ADC_JSON_TEXTO || !adc_idioma_ler(id->texto, &pC->opcoes.idioma))) { if (pErroOpcoes) *pErroOpcoes = "\"idioma\" deve ser \"en\" ou \"pt-BR\""; return false; }
+            pC->msgs.idioma = pC->opcoes.idioma;
+        }
         const ADC_Json* at = adc_json_membro(pOpcoes, "atributos");
         if (at) {
             if (at->tipo != ADC_JSON_OBJETO) { if (pErroOpcoes) *pErroOpcoes = "\"atributos\" deve ser um objeto { nome: valor }"; return false; }

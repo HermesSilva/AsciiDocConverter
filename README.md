@@ -22,9 +22,16 @@ void ADC_Liberar(void* memoria);
 const char* ADC_Versao(void);
 ```
 
-Falha devolve um código e **sempre** as mensagens (JSON: nível, linha, coluna, texto em pt-BR) — também no
-sucesso, porque aviso do processador não se perde. A biblioteca **nunca lê disco**: `include::` e imagens
-chegam pelo callback do chamador; sem callback, tudo é negado com aviso (modo seguro).
+Falha devolve um código e **sempre** as mensagens (JSON: nível, linha, coluna, texto) — também no sucesso,
+porque aviso do processador não se perde. **O texto sai em inglês; com `"idioma": "pt-BR"` nas opções, em
+português** (DAD-10, 2026-10-31 — o helper C# do Tootega Core manda o idioma sempre). A biblioteca **nunca lê
+disco**: `include::` e imagens chegam pelo callback do chamador; sem callback, tudo é negado com aviso (modo seguro).
+
+**A ABI acima está congelada** (DAD-9): o que nasceu depois — resolvedor com origem (include dentro de include),
+mensagens com o arquivo de origem, DocBook 5, imagens em `data:` e folha de estilo própria — só é alcançável pela
+**entrada WebAssembly** (`wasm/adc_wasm.c`, `Dist/AsciiDocConverter.wasm`), que a extensão
+[Tootega AsciiDoc](https://github.com/HermesSilva/TootegaAsciiDoc) do VS Code consome. Opções novas, todas opt-in:
+`idioma`, `dataUri`, `folhaDeEstilo`, `pdf.dataDeCriacao` (ver `include/adc.h`).
 
 ## Como compilar
 
@@ -32,6 +39,7 @@ chegam pelo callback do chamador; sem callback, tudo é negado com aviso (modo s
 |---|---|
 | Distribuição (`Dist/`, versionada) | `.\Build-AsciiDocConverter.ps1` — Windows pelo MSBuild do Visual Studio; Linux x64+arm64 num contêiner Debian (Docker). Num Linux/WSL sem Docker: `RAIZ=$(pwd) ARQUITETURAS=linux-x64 bash build-linux.sh` |
 | Ciclo de desenvolvimento | `.\Compilar-Dev.ps1` (MSVC, `/W4 /WX`) ou `bash compilar-dev.sh` (gcc, ASan/UBSan) → `obj/dev*/adc_cli` e `adc_tck` |
+| WebAssembly (`Dist/AsciiDocConverter.wasm`) | `bash wasm/build-wasm.sh` num Linux/WSL com o [wasi-sdk](https://github.com/WebAssembly/wasi-sdk/releases) em `~/wasi-sdk` (ou `WASI_SDK_PATH`); do Windows, `.\Build-AsciiDocConverter.ps1 -Alvo Wasm` chama o WSL. Mesmo fonte C; nada de Docker |
 | Fontes embutidas | geradas no build por `ferramentas/gerar_fontes.py` (Python 3, só biblioteca padrão) a partir de `fontes/*.ttf` |
 
 ## Como converter um arquivo pela linha de comando

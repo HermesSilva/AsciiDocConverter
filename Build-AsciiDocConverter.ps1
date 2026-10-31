@@ -9,15 +9,17 @@
         AsciiDocConverter.win-x64.dll
         AsciiDocConverter.linux-x64.so
         AsciiDocConverter.linux-arm64.so
+        AsciiDocConverter.wasm            (entrada WebAssembly — a extensão do VS Code; DAD-13)
 
     Windows: MSBuild.exe do Visual Studio (o dotnet CLI não carrega os alvos do C++) sobre AsciiDocConverter.vcxproj.
     Linux:   contêiner Debian (Docker) com build-essential, crossbuild-essential-arm64 e python3;
              a compilação em si vive em build-linux.sh, ao lado deste arquivo.
+    Wasm:    wasm/build-wasm.sh pelo WSL, com o wasi-sdk em ~/wasi-sdk (ou WASI_SDK_PATH).
 
     Mesmo padrão do Build-TootegaLZMA.ps1 da plataforma.
 
 .PARAMETER Alvo
-    Todos (padrão), Windows ou Linux.
+    Todos (padrão), Windows, Linux ou Wasm.
 .PARAMETER Configuracao
     Release (padrão) ou Debug — só afeta o Windows.
 .PARAMETER Limpar
@@ -25,7 +27,7 @@
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('Todos', 'Windows', 'Linux')] [string] $Alvo = 'Todos',
+    [ValidateSet('Todos', 'Windows', 'Linux', 'Wasm')] [string] $Alvo = 'Todos',
     [ValidateSet('Release', 'Debug')] [string] $Configuracao = 'Release',
     [switch] $Limpar
 )
@@ -73,12 +75,23 @@ function Compilar-Linux {
     if ($LASTEXITCODE -ne 0) { throw "Build Linux falhou (código $LASTEXITCODE). O daemon do Docker está ativo?" }
 }
 
+function Compilar-Wasm {
+    Escrever-Etapa 'WebAssembly (wasi-sdk via WSL)'
+    $wsl = Get-Command wsl -ErrorAction SilentlyContinue
+    if (-not $wsl) { throw "WSL não encontrado — o build WebAssembly roda wasm/build-wasm.sh num Linux com o wasi-sdk (~/wasi-sdk ou WASI_SDK_PATH)." }
+    $caminhoWsl = & wsl -e wslpath -a $RaizProjeto
+    if ($LASTEXITCODE -ne 0) { throw "wslpath falhou para $RaizProjeto." }
+    & wsl -e bash -lc "cd '$caminhoWsl' && bash wasm/build-wasm.sh"
+    if ($LASTEXITCODE -ne 0) { throw "Build WebAssembly falhou (código $LASTEXITCODE). O wasi-sdk está em ~/wasi-sdk no WSL?" }
+}
+
 if ($Alvo -in @('Todos', 'Windows')) { Compilar-Windows }
 if ($Alvo -in @('Todos', 'Linux'))   { Compilar-Linux }
+if ($Alvo -in @('Todos', 'Wasm'))    { Compilar-Wasm }
 
 Escrever-Etapa 'Distribuição'
-$esperados = @{ 'Windows' = @('AsciiDocConverter.win-x64.dll'); 'Linux' = @('AsciiDocConverter.linux-x64.so', 'AsciiDocConverter.linux-arm64.so') }
-$aConferir = switch ($Alvo) { 'Windows' { $esperados['Windows'] } 'Linux' { $esperados['Linux'] } default { $esperados['Windows'] + $esperados['Linux'] } }
+$esperados = @{ 'Windows' = @('AsciiDocConverter.win-x64.dll'); 'Linux' = @('AsciiDocConverter.linux-x64.so', 'AsciiDocConverter.linux-arm64.so'); 'Wasm' = @('AsciiDocConverter.wasm') }
+$aConferir = switch ($Alvo) { 'Windows' { $esperados['Windows'] } 'Linux' { $esperados['Linux'] } 'Wasm' { $esperados['Wasm'] } default { $esperados['Windows'] + $esperados['Linux'] + $esperados['Wasm'] } }
 $faltando = @()
 foreach ($nome in $aConferir) {
     $arquivo = Join-Path $Dist $nome
